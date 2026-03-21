@@ -1,0 +1,77 @@
+año,departamento,cargo,fuerza_politica,representantes_electos,id_dep
+2021,Chuquisaca,Asambleísta PIOC,C.C.CH,2,1
+2021,Chuquisaca,Asambleísta por población,CST,4,1
+2021,Chuquisaca,Asambleísta por población,MAS-IPSP,5,1
+2021,Chuquisaca,Asambleísta por territorio,CST,1,1
+2021,Chuquisaca,Asambleísta por territorio,MAS-IPSP,9,1
+2021,Chuquisaca,Gobernador,CST,1,1
+2021,La Paz,Asambleísta PIOC,C.I.P.T.A. - ARAONA,1,2
+2021,La Paz,Asambleísta PIOC,CONAFRO,1,2
+2021,La Paz,Asambleísta PIOC,O.P.I.M,1,2
+2021,La Paz,Asambleísta PIOC,P.I.L.C.O.L.,1,2
+2021,La Paz,Asambleísta por población,J.A. LLALLA.L.P.,6,2
+2021,La Paz,Asambleísta por población,MAS-IPSP,9,2
+2021,La Paz,Asambleísta por población,PBCSP,5,2
+2021,La Paz,Asambleísta por territorio,J.A. LLALLA.L.P.,2,2
+2021,La Paz,Asambleísta por territorio,MAS-IPSP,16,2
+2021,La Paz,Asambleísta por territorio,MTS,1,2
+2021,La Paz,Asambleísta por territorio,SOL.BO,1,2
+2021,La Paz,Gobernador,J.A. LLALLA.L.P.,1,2
+2021,Cochabamba,Asambleísta PIOC,CIRI,1,3
+2021,Cochabamba,Asambleísta PIOC,CONIYURA - CONISUR - CIRI,1,3
+2021,Cochabamba,Asambleísta por población,MAS-IPSP,10,3
+2021,Cochabamba,Asambleísta por población,MTS,1,3
+2021,Cochabamba,Asambleísta por población,SUMATE,5,3
+2021,Cochabamba,Asambleísta por territorio,MAS-IPSP,15,3
+2021,Cochabamba,Asambleísta por territorio,SUMATE,1,3
+2021,Cochabamba,Gobernador,MAS-IPSP,1,3
+2021,Oruro,Asambleísta PIOC,URU,1,4
+2021,Oruro,Asambleísta por población,BST,2,4
+2021,Oruro,Asambleísta por población,MAS-IPSP,9,4
+2021,Oruro,Asambleísta por población,MTS,1,4
+2021,Oruro,Asambleísta por población,PP,1,4
+2021,Oruro,Asambleísta por población,UN SOL PARA ORURO,3,4
+2021,Oruro,Asambleísta por territorio,MAS-IPSP,16,4
+2021,Oruro,Gobernador,MAS-IPSP,1,4
+2021,Potosí,Asambleísta por población,AS,3,5
+2021,Potosí,Asambleísta por población,MAS-IPSP,9,5
+2021,Potosí,Asambleísta por población,MOP,1,5
+2021,Potosí,Asambleísta por población,PAN-BOL,2,5
+2021,Potosí,Asambleísta por población,PUKA SUNQU,1,5
+2021,Potosí,Asambleísta por territorio,MAS-IPSP,15,5
+2021,Potosí,Asambleísta por territorio,PAN-BOL,1,5
+2021,Potosí,Gobernador,MAS-IPSP,1,5
+2021,Santa Cruz,Asambleísta PIOC,GUARANÍ,1,6
+2021,Santa Cruz,Asambleísta PIOC,GUARAYO,1,6
+2021,Santa Cruz,Asambleísta PIOC,YURACARÉ - MOJEÑO,1,6
+2021,Santa Cruz,Asambleísta por población,CREEMOS,5,6
+2021,Santa Cruz,Asambleísta por población,MAS-IPSP,3,6
+2021,Santa Cruz,Asambleísta por territorio,ASIP,1,6
+2021,Santa Cruz,Asambleísta por territorio,CREEMOS,6,6
+2021,Santa Cruz,Asambleísta por territorio,MAS-IPSP,8,6
+2021,Santa Cruz,Gobernador,CREEMOS,1,6
+2021,Tarija,Asambleísta PIOC,A.P.I.T.,1,7
+2021,Tarija,Asambleísta PIOC,C.C.G.T.,1,7
+2021,Tarija,Asambleísta por población,MAS-IPSP,7,7
+2021,Tarija,Asambleísta por población,TODOS,2,7
+2021,Tarija,Asambleísta por población,UNIDOS,6,7
+2021,Tarija,Asambleísta por territorio,MAS-IPSP,6,7
+2021,Tarija,Asambleísta por territorio,UNIDOS,6,7
+2021,Tarija,Gobernador,UNIDOS,1,7
+2021,Beni,Asambleísta PIOC,Federación Sindical Única de Trabajadores Campesinos de Beni,1,8
+2021,Beni,Asambleísta PIOC,"Tacana, Pacahuara, Itonama, Joaquiniano, Maropa, Guarasugwe, Mojeño, Sirionó, Baure, Tsimane, Movima, Cayubaba. More, Cavineño, Chacobo, Canichana, Mosetén y Yuracaré",1,8
+2021,Beni,Asambleísta por territorio,MAS-IPSP,12,8
+2021,Beni,Asambleísta por territorio,MTS,7,8
+2021,Beni,Asambleísta por territorio,TODOS,5,8
+2021,Beni,Gobernador,MTS,1,8
+2021,Pando,Asambleísta PIOC,CAVINEÑO,1,9
+2021,Pando,Asambleísta PIOC,MACHINERI,1,9
+2021,Pando,Asambleísta PIOC,TACANA,1,9
+2021,Pando,Asambleísta por población,MAS-IPSP,2,9
+2021,Pando,Asambleísta por población,MTS,1,9
+2021,Pando,Asambleísta por territorio,CID,2,9
+2021,Pando,Asambleísta por territorio,MAS-IPSP,11,9
+2021,Pando,Asambleísta por territorio,MDA,1,9
+2021,Pando,Asambleísta por territorio,P.S.T.,1,9
+2021,Pando,Gobernador,MTS,1,9
+
