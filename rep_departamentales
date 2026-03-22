@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Electoral Bolivia — Asambleas Departamentales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="apple-touch-icon" sizes="180x180" href="image/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="image/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="image/favicon-16x16.png">
+<link rel="manifest" href="site.webmanifest">
+<style>
+/* === BASE Y REINICIO === */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0f1117;
+  --bg2:       #181c27;
+  --bg3:       #1f2333;
+  --border:    rgba(255,255,255,0.08);
+  --border2:   rgba(255,255,255,0.14);
+  --text:      #e8e6df;
+  --text2:     #8a8880;
+  --text3:     #5a5855;
+  --accent:    #c9a84c;
+  --accent2:   #e8c96a;
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --radius:    8px;
+  --radius-lg: 14px;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* === CABECERA (HEADER) === */
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 120px;
+  position: sticky;
+  top: 0;
+  background: rgba(15,17,23,0.92);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+}
+.logo {
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.header-meta {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: .04em;
+}
+#status-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--text3);
+  margin-right: 6px;
+  vertical-align: middle;
+  transition: background .4s;
+}
+#status-dot.ok  { background: #4caf7d; box-shadow: 0 0 6px #4caf7d88; }
+#status-dot.err { background: #e05252; }
+
+/* === VISUALIZACIÓN PRINCIPAL === */
+main { max-width: 1100px; margin: 0 auto; padding: 40px 32px 80px; }
+
+/* === HERO === */
+.hero { margin-bottom: 40px; }
+.hero h1 {
+  font-family: var(--font-head);
+  font-size: clamp(22px, 3vw, 34px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -.01em;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.hero h1 span { color: var(--accent); }
+.hero p { font-size: 13px; color: var(--text2); max-width: 560px; }
+
+/* === CONTROLES === */
+.controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 32px;
+  padding: 16px 20px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.ctrl-group { display: flex; align-items: center; gap: 8px; }
+.ctrl-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+select {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 32px 7px 12px;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  background: var(--bg3);
+  color: var(--text);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a5855'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: border-color .2s;
+}
+select:hover { border-color: var(--accent); }
+select:focus { outline: none; border-color: var(--accent); }
+
+/* === TÍTULOS DE SECCIÓN === */
+.section-title {
+  font-family: var(--font-head);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin: 32px 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* === BARRA PRINCIPAL (GLOBAL) === */
+.majority-block {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  margin-bottom: 10px;
+}
+.bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+.bar-title { font-size: 13px; font-weight: 500; color: var(--text2); }
+.bar-stats { font-size: 12px; color: var(--text3); }
+.bar-stats b { color: var(--accent); font-weight: 500; }
+.seats-track {
+  display: flex;
+  height: 28px;
+  border-radius: 5px;
+  overflow: hidden;
+  width: 100%;
+}
+.seats-seg {
+  height: 100%;
+  transition: width .5s cubic-bezier(.4,0,.2,1);
+  cursor: default;
+  position: relative;
+}
+.seats-seg:hover { filter: brightness(1.18); }
+.maj-wrap { position: relative; height: 18px; margin-top: 2px; }
+.maj-line {
+  position: absolute; top: 0;
+  width: 1px; height: 12px;
+  background: var(--text2);
+}
+.maj-label {
+  position: absolute; top: 0;
+  font-size: 10px; color: var(--text3);
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* === LEYENDA === */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 12px 0 6px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text2);
+}
+.ldot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.legend-item b { color: var(--text); font-weight: 500; }
+
+/* === SECCIÓN GOBERNACIONES === */
+.tipo-gov { background: rgba(153,53,86,.15); color: #d4537e; }
+.gov-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+.gov-card {
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  border: 1px solid transparent;
+}
+.gov-card-dep { font-size: 10px; margin-bottom: 3px; opacity: .7; }
+.gov-card-name { font-size: 12px; font-weight: 500; }
+.gov-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 10px;
+  flex-shrink: 0;
+}
+.gov-pill-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.gov-pill-text { font-size: 11px; font-weight: 500; line-height: 1.3; }
+.gov-pill-label { font-size: 10px; color: var(--text3); display: block; }
+
+/* === SECCIÓN ASAMBLEA === */
+.asamblea-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+  gap: 12px;
+}
+.asamblea-block {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  transition: border-color .2s;
+}
+.asamblea-block:hover { border-color: var(--border2); }
+.asamblea-dep {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.asamblea-dep-name {
+  font-family: var(--font-head);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.asamblea-dep-total {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+/* === BARRAS SECUNDARIAS === */
+.sub-row { margin-bottom: 10px; }
+.sub-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.tipo-badge {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: .03em;
+}
+.tipo-pob  { background: rgba(55,138,221,.15); color: #6db3f2; }
+.tipo-ter  { background: rgba(29,158,117,.15); color: #5ecba1; }
+.tipo-pioc { background: rgba(186,117,23,.15); color: #e0b060; }
+.sub-count { font-size: 11px; color: var(--text3); }
+.sub-bar {
+  display: flex;
+  height: 14px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sub-seg { height: 100%; cursor: default; transition: filter .15s; }
+.sub-seg:hover { filter: brightness(1.2); }
+
+/* === DATOS TOTALES === */
+.total-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.chip {
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
+}
+
+/* === TABLA DE COMPARACIÓN === */
+.dep-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.dep-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 13px;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+.dep-card:hover { border-color: var(--border2); background: var(--bg3); }
+.dep-card.active { border-color: var(--accent); }
+.dep-card-name {
+  font-family: var(--font-head);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 7px;
+}
+.dep-minibar {
+  display: flex;
+  height: 4px;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.dep-miniseg { height: 100%; }
+.dep-info { font-size: 10px; color: var(--text3); line-height: 1.6; }
+.dep-info b { font-weight: 500; }
+
+/* === COMPARACIÓN POR AÑOS === */
+.year-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.year-col {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.year-badge {
+  font-family: var(--font-head);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+  display: inline-block;
+}
+.year-2021 { background: rgba(55,138,221,.15); color: #6db3f2; }
+.year-2026 { background: rgba(201,168,76,.15); color: var(--accent2); }
+.no-data {
+  font-size: 12px;
+  color: var(--text3);
+  font-style: italic;
+  padding: 20px 0;
+  text-align: center;
+}
+
+/* === CARGA DE PÁGINA Y DATOS === */
+#loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  gap: 16px;
+  color: var(--text3);
+  font-size: 13px;
+}
+.spinner {
+  width: 28px; height: 28px;
+  border: 2px solid var(--border2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* === ERROR === */
+#error-msg {
+  display: none;
+  background: rgba(224,82,82,.1);
+  border: 1px solid rgba(224,82,82,.25);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  font-size: 13px;
+  color: #e08080;
+  margin-bottom: 24px;
+}
+
+/* === PIE (FOOTER) === */
+footer {
+  border-top: 1px solid var(--border);
+  margin-top: 64px;
+  padding: 24px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+footer p { font-size: 11px; color: var(--text3); }
+footer a { color: var(--accent); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+/* === RESPONSIVIDAD === */
+@media (max-width: 700px) {
+  main { padding: 24px 16px 60px; }
+  header { padding: 0 16px; }
+  .asamblea-grid { grid-template-columns: 1fr; }
+  .dep-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .year-compare { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><img src="image/vectra_ia_lab_transparente.png" height="120"></div>
+  <div class="header-meta">
+    <span id="status-dot"></span>
+    <span id="status-text">Cargando datos…</span>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>Elecciones Subnacionales en Bolivia.<br>Nivel Departamental</h1>
+	<h2>Gobernaciones y Asambleas Legislativas<br><span>Departamentales</span></h2>
+    <p>Composición de las 9 asambleas departamentales de Bolivia. Datos actualizados (solamente con los resultados de 2021)</p>
+	<p>Próximamente Datos actualizados a 2026</p>
+  </div>
+
+  <div id="error-msg"></div>
+
+  <div class="controls" id="controls" style="display:none">
+    <div class="ctrl-group">
+      <span class="ctrl-label">Departamento</span>
+      <select id="dep-sel" onchange="render()">
+        <option value="todos">Todos</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Vista</span>
+      <select id="view-sel" onchange="render()">
+        <option value="asamblea">Composición asamblea</option>
+        <option value="comparar">Comparar años</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <span>Cargando datos…</span>
+  </div>
+
+  <div id="content" style="display:none"></div>
+</main>
+
+<footer>
+  <p>Fuente: Tribunal Supremo Electoral · Bolivia · Elecciones Subnacionales 2021</p>
+</footer>
+
+<script>
+
+const CONFIG = {
+  ARCHIVO_CSV: 'data/representantes_dep.csv',
+};
+
+const PCOLORS = {
+  'MAS-IPSP':'#0057A8','MAS.IPSP':'#0057A8',
+  'CREEMOS':'#1B9E4E','CST':'#D4A017',
+  'J.A. LLALLA.L.P.':'#7B3FA0','PBCSP':'#9B59B6',
+  'SUMATE':'#E67E22','MTS':'#16A085',
+  'TODOS':'#E0421F','UNIDOS':'#C0392B',
+  'BST':'#2980B9','AS':'#8E44AD',
+  'PAN-BOL':'#D35400','UN SOL PARA ORURO':'#27AE60',
+  'SOL.BO':'#1ABC9C','ASIP':'#F39C12',
+  'PP':'#7F8C8D','MOP':'#6C3483',
+  'PUKA SUNQU':'#CB4335','CID':'#1F618D',
+  'MDA':'#117A65','P.S.T.':'#784212',
+  'URU':'#B7950B',
+  'UNIDOS':'#C0392B',
+};
+const DC = ['#378ADD','#1D9E75','#D85A30','#BA7517','#534AB7','#D4537E','#639922','#0F6E56','#993C1D','#888780','#2980B9','#8E44AD'];
+function pc(p) { return PCOLORS[p] || DC[Math.abs(hs(p)) % DC.length]; }
+function hs(s) { let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))|0; return h; }
+
+// Abreviaciones para nombres largos
+const ABBR = {
+  'J.A. LLALLA.L.P.': 'J.A.LL.L.P',
+  'C.I.P.T.A. - ARAONA': 'CIPTA',
+  'CONIYURA - CONISUR - CIRI': 'CONISUR',
+  'Federación Sindical Única de Trabajadores Campesinos de Beni': 'FSUTCB-Beni',
+  'Tacana, Pacahuara, Itonama, Joaquiniano, Maropa, Guarasugwe, Mojeño, Sirionó, Baure, Tsimane, Movima, Cayubaba. More, Cavineño, Chacobo, Canichana, Mosetén y Yuracaré': 'Naciones Indígenas',
+  'YURACARÉ - MOJEÑO': 'YUR-MOJ',
+  'UN SOL PARA ORURO': 'U.S.P.O.',
+};
+function abbr(p) { return ABBR[p] || (p.length > 14 ? p.slice(0,14)+'…' : p); }
+
+// Parsear CSV simple
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.replace(/"/g,'').trim());
+  return lines.slice(1).map(line => {
+    // Manejar comas dentro de comillas
+    const cols = [];
+    let cur = '', inQ = false;
+    for (let c of line) {
+      if (c==='"') { inQ=!inQ; }
+      else if (c===',' && !inQ) { cols.push(cur.trim()); cur=''; }
+      else { cur+=c; }
+    }
+    cols.push(cur.trim());
+    const row = {};
+    headers.forEach((h,i) => { row[h] = (cols[i]||'').replace(/"/g,'').trim(); });
+    return row;
+  }).filter(r => r[headers[0]]);
+}
+
+// Gobernadores electos 2021
+const GOV_DATA = {
+  'Chuquisaca': 'CST',
+  'La Paz':     'J.A. LLALLA.L.P.',
+  'Cochabamba': 'MAS-IPSP',
+  'Oruro':      'MAS-IPSP',
+  'Potosí':     'MAS-IPSP',
+  'Santa Cruz': 'CREEMOS',
+  'Tarija':     'UNIDOS',
+  'Beni':       'MTS',
+  'Pando':      'MTS',
+};
+// En 2026 se agregará automáticamente cuando se actualicen los datos
+let RAW = [];   // representantes
+let VOTOS = []; // votos
+const DEPS = ['Beni','Chuquisaca','Cochabamba','La Paz','Oruro','Pando','Potosí','Santa Cruz','Tarija'];
+const TIPO_MAP = {
+  'Asambleísta por población': 'pob',
+  'Asambleísta por territorio': 'ter',
+  'Asambleísta PIOC': 'pioc',
+};
+const TIPO_LABEL = { pob:'Por población', ter:'Por territorio', pioc:'PIOC' };
+const TIPO_CLS   = { pob:'tipo-pob', ter:'tipo-ter', pioc:'tipo-pioc' };
+
+async function loadData() {
+  try {
+    const text = await fetch(CONFIG.ARCHIVO_CSV).then(r => {
+      if (!r.ok) throw new Error(`No se encontró ${CONFIG.ARCHIVO_CSV}`);
+      return r.text();
+    });
+
+    const rows = parseCSV(text);
+
+    // Asambleístas
+    RAW = rows
+      .filter(r => TIPO_MAP[r.cargo])
+      .map(r => ({
+        año: parseInt(r.año)||0,
+        d:   r.departamento,
+        t:   TIPO_MAP[r.cargo],
+        p:   r.fuerza_politica,
+        n:   parseInt(r.representantes_electos)||0,
+      }));
+
+    // Gobernadores — sobreescribe GOV_DATA con lo que haya en el CSV
+    rows.filter(r => r.cargo === 'Gobernador').forEach(r => {
+      GOV_DATA[r.departamento] = r.fuerza_politica;
+    });
+
+    // Poblar selector
+    const sel = document.getElementById('dep-sel');
+    DEPS.forEach(d => {
+      const o = document.createElement('option');
+      o.value = d; o.textContent = d;
+      sel.appendChild(o);
+    });
+
+    const años = [...new Set(RAW.map(r => r.año))].sort();
+    setStatus('ok', `Datos cargados · ${años.join(', ')}`);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('controls').style.display = 'flex';
+    document.getElementById('content').style.display = 'block';
+    render();
+
+  } catch(e) {
+    setStatus('err', 'Error al leer CSV');
+    document.getElementById('loading').style.display = 'none';
+    const err = document.getElementById('error-msg');
+    err.style.display = 'block';
+    err.innerHTML = `
+      <b>No se pudo leer <code>${CONFIG.ARCHIVO_CSV}</code>.</b><br>
+      Asegúrate de que el archivo con los datos este presente.<br>
+      <small style="opacity:.7">Si abres el archivo directamente desde el explorador (protocolo <code>file://</code>),
+      usa un servidor local: en VS Code instala "Live Server", o ejecuta
+      <code>python -m http.server</code> en esa carpeta y abre <code>http://localhost:8000</code>.</small>`;
+  }
+}
+
+function setStatus(state, text) {
+  const dot = document.getElementById('status-dot');
+  dot.className = state;
+  document.getElementById('status-text').textContent = text;
+}
+
+// Helpers de datos
+function getSeats(dep, tipo, año) {
+  const map = {};
+  RAW.filter(r =>
+    (dep==='todos'||r.d===dep) &&
+    r.t===tipo &&
+    (año===0||r.año===año)
+  ).forEach(r => { map[r.p]=(map[r.p]||0)+r.n; });
+  return Object.entries(map).sort((a,b)=>b[1]-a[1]);
+}
+function allSeats(dep, año) {
+  const map = {};
+  RAW.filter(r => (dep==='todos'||r.d===dep) && (año===0||r.año===año))
+     .forEach(r => { map[r.p]=(map[r.p]||0)+r.n; });
+  return Object.entries(map).sort((a,b)=>b[1]-a[1]);
+}
+function getYears() {
+  return [...new Set(RAW.map(r=>r.año))].sort();
+}
+
+// Componentes HTML
+function majorityBarHTML(seats, label) {
+  const total = seats.reduce((s,x)=>s+x[1],0);
+  if (!total) return '';
+  const maj = Math.floor(total/2)+1;
+  const majPct = (maj/total*100).toFixed(1);
+  const segs = seats.map(([p,n])=>
+    `<div class="seats-seg" style="width:${(n/total*100).toFixed(1)}%;background:${pc(p)}" title="${abbr(p)}: ${n} escaños"></div>`
+  ).join('');
+  return `
+    <div class="majority-block">
+      <div class="bar-header">
+        <span class="bar-title">${label}</span>
+        <span class="bar-stats">Total: <b>${total}</b> · Mayoría: <b>${maj}</b></span>
+      </div>
+      <div class="seats-track">${segs}</div>
+      <div class="maj-wrap">
+        <div class="maj-line" style="left:${majPct}%"></div>
+        <span class="maj-label" style="left:${majPct}%">Mayoría: ${maj}</span>
+      </div>
+    </div>`;
+}
+
+function legendHTML(seats) {
+  return `<div class="legend">${seats.map(([p,n])=>
+    `<span class="legend-item"><span class="ldot" style="background:${pc(p)}"></span>${abbr(p)} <b>${n}</b></span>`
+  ).join('')}</div>`;
+}
+
+function subBarHTML(seats, tipo) {
+  const total = seats.reduce((s,x)=>s+x[1],0);
+  if (!total) return '';
+  const segs = seats.map(([p,n])=>
+    `<div class="sub-seg" style="width:${(n/total*100).toFixed(1)}%;background:${pc(p)}" title="${abbr(p)}: ${n}"></div>`
+  ).join('');
+  return `
+    <div class="sub-row">
+      <div class="sub-label">
+        <span class="tipo-badge ${TIPO_CLS[tipo]}">${TIPO_LABEL[tipo]}</span>
+        <span class="sub-count">${total} escaños</span>
+      </div>
+      <div class="sub-bar">${segs}</div>
+    </div>`;
+}
+
+function asambleaBlockHTML(dep, año) {
+  const pobS  = getSeats(dep,'pob',año);
+  const terS  = getSeats(dep,'ter',año);
+  const piocS = getSeats(dep,'pioc',año);
+  const totS  = allSeats(dep,año);
+  const total = totS.reduce((s,x)=>s+x[1],0);
+  if (!total) return `<div class="asamblea-block"><div class="asamblea-dep"><div><div class="asamblea-dep-name">${dep}</div></div></div><div class="no-data">Sin datos para este año</div></div>`;
+  const chips = totS.slice(0,5).map(([p,n])=>
+    `<span class="chip" style="background:${pc(p)}22;color:${pc(p)}">`+
+    `<span class="ldot" style="background:${pc(p)}"></span>${abbr(p)} <b>${n}</b></span>`
+  ).join('');
+  return `
+    <div class="asamblea-block">
+      <div class="asamblea-dep">
+        <div>
+          <div class="asamblea-dep-name">${dep}</div>
+          <div class="asamblea-dep-total">${total} asambleístas</div>
+        </div>
+        ${govPillHTML(dep)}
+      </div>
+      ${pobS.length  ? subBarHTML(pobS,'pob')   : ''}
+      ${terS.length  ? subBarHTML(terS,'ter')   : ''}
+      ${piocS.length ? subBarHTML(piocS,'pioc') : ''}
+      <div class="total-chips">${chips}</div>
+    </div>`;
+}
+
+function depCardHTML(dep, activeDep, año) {
+  const totS  = allSeats(dep, año);
+  const total = totS.reduce((s,x)=>s+x[1],0);
+  const segs  = totS.map(([p,n])=>
+    `<div class="dep-miniseg" style="width:${(n/total*100).toFixed(0)}%;background:${pc(p)}"></div>`
+  ).join('');
+  const top   = totS.slice(0,2).map(([p,n])=>`<b style="color:${pc(p)}">${abbr(p)}</b> ${n}`).join(' · ');
+  const hasPioc = RAW.some(r=>r.d===dep&&r.t==='pioc'&&(año===0||r.año===año));
+  const g = GOV_DATA[dep];
+  return `
+    <div class="dep-card${activeDep===dep?' active':''}" onclick="selectDep('${dep}')">
+      <div class="dep-card-name">${dep}</div>
+      <div class="dep-minibar">${segs}</div>
+      <div class="dep-info">
+        ${total ? top : 'Sin datos'}
+        ${g ? `<br>Gob: <b style="color:${pc(g)}">${abbr(g)}</b>` : ''}
+        ${hasPioc ? ' · <span style="color:var(--accent)">PIOC</span>' : ''}
+      </div>
+    </div>`;
+}
+
+// Gobernaciones
+function govPillHTML(dep) {
+  const p = GOV_DATA[dep];
+  if (!p) return '';
+  const color = pc(p);
+  return `<div class="gov-pill">
+    <div class="gov-pill-dot" style="background:${color}"></div>
+    <div class="gov-pill-text">
+      <span class="gov-pill-label">Gobernador/a</span>
+      <span style="color:${color}">${abbr(p)}</span>
+    </div>
+  </div>`;
+}
+
+function govResumenHTML(deps) {
+  const map = {};
+  deps.forEach(d => {
+    const p = GOV_DATA[d];
+    if (p) { map[p] = map[p] || []; map[p].push(d); }
+  });
+  const sorted = Object.entries(map).sort((a,b) => b[1].length - a[1].length);
+  const segs = sorted.map(([p,ds]) =>
+    `<div class="seats-seg" style="width:${(ds.length/deps.length*100).toFixed(0)}%;background:${pc(p)}" title="${abbr(p)}: ${ds.join(', ')}"></div>`
+  ).join('');
+  const cards = deps.map(d => {
+    const p = GOV_DATA[d]; if (!p) return '';
+    const color = pc(p);
+    return `<div class="gov-card" style="background:${color}18;border-color:${color}33">
+      <div class="gov-card-dep" style="color:${color}99">${d}</div>
+      <div class="gov-card-name" style="color:${color}">${abbr(p)}</div>
+    </div>`;
+  }).join('');
+  return `
+    <div class="majority-block">
+      <div class="bar-header">
+        <span class="bar-title">Gobernaciones</span>
+        <span class="bar-stats"><b>${deps.length}</b> departamentos</span>
+      </div>
+      <div class="seats-track">${segs}</div>
+      <div class="gov-grid">${cards}</div>
+    </div>`;
+}
+
+// Render principal
+function selectDep(dep) {
+  document.getElementById('dep-sel').value = dep;
+  render();
+}
+
+function render() {
+  const dep   = document.getElementById('dep-sel').value;
+  const view  = document.getElementById('view-sel').value;
+  const years = getYears();
+  const año   = 0; // siempre mostrar todos los años disponibles en vista asamblea
+  const depsToShow = dep==='todos' ? DEPS : [dep];
+  const totS  = allSeats(dep, 0);
+  let html    = '';
+
+  if (view === 'asamblea') {
+    // Vista composición
+    html += `<div class="section-title">Gobernaciones</div>`;
+    html += govResumenHTML(depsToShow);
+
+    html += `<div class="section-title">Composición de asambleas${dep==='todos'?'':' · '+dep}</div>`;
+    html += majorityBarHTML(totS, dep==='todos'?'Todos los departamentos':'Asamblea Departamental · '+dep);
+    html += legendHTML(totS);
+
+    html += `<div class="section-title">Desglose por departamento y tipo de cargo</div>`;
+    html += `<div class="asamblea-grid">`;
+    depsToShow.forEach(d => { html += asambleaBlockHTML(d, 0); });
+    html += `</div>`;
+
+    if (dep !== 'todos') {
+      html += `<div class="section-title">Comparar departamentos</div>`;
+      html += `<div class="dep-grid">${DEPS.map(d=>depCardHTML(d,dep,0)).join('')}</div>`;
+    } else {
+      html += `<div class="section-title">Seleccionar departamento</div>`;
+      html += `<div class="dep-grid">${DEPS.map(d=>depCardHTML(d,'todos',0)).join('')}</div>`;
+    }
+
+  } else {
+    // Vista comparación por años
+    const y2021 = years.includes(2021) ? 2021 : 0;
+    const y2026 = years.includes(2026) ? 2026 : null;
+
+    html += `<div class="section-title">Comparación por año${dep==='todos'?'':' · '+dep}</div>`;
+
+    depsToShow.forEach(dep2 => {
+      html += `<div style="margin-bottom:24px">`;
+      if (depsToShow.length > 1) {
+        html += `<div class="section-title">${dep2}</div>`;
+      }
+      html += `<div class="year-compare">`;
+
+      // 2021
+      html += `<div class="year-col">
+        <span class="year-badge year-2021">2021</span>`;
+      if (y2021) {
+        const s = allSeats(dep2, 2021);
+        html += majorityBarHTML(s, dep2);
+        html += legendHTML(s);
+        html += `<div style="margin-top:12px">${['pob','ter','pioc'].map(t=>{
+          const ss=getSeats(dep2,t,2021);
+          return ss.length?subBarHTML(ss,t):'';
+        }).join('')}</div>`;
+      } else {
+        html += `<div class="no-data">Sin datos 2021</div>`;
+      }
+      html += `</div>`;
+
+      // 2026
+      html += `<div class="year-col">
+        <span class="year-badge year-2026">2026</span>`;
+      if (y2026) {
+        const s = allSeats(dep2, 2026);
+        html += majorityBarHTML(s, dep2);
+        html += legendHTML(s);
+        html += `<div style="margin-top:12px">${['pob','ter','pioc'].map(t=>{
+          const ss=getSeats(dep2,t,2026);
+          return ss.length?subBarHTML(ss,t):'';
+        }).join('')}</div>`;
+      } else {
+        html += `<div class="no-data">Aún no se han actualizado los datos de <code>2026</code> para ver la comparación aquí.</div>`;
+      }
+      html += `</div>`;
+
+      html += `</div></div>`; // year-compare + dep wrapper
+    });
+  }
+
+  document.getElementById('content').innerHTML = html;
+}
+
+// Iniciar
+loadData();
+</script>
+</body>
+</html>
