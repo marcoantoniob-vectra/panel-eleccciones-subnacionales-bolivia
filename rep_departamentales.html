@@ -18,6 +18,7 @@
   --bg:        #0f1117;
   --bg2:       #181c27;
   --bg3:       #1f2333;
+  --bg-dark:   #0d1117;
   --border:    rgba(255,255,255,0.08);
   --border2:   rgba(255,255,255,0.14);
   --text:      #e8e6df;
@@ -64,9 +65,10 @@ header {
   color: var(--accent);
 }
 .header-meta {
-  font-size: 11px;
+  font-size: 1.35rem;
+  font-weight: 700;
   color: var(--text3);
-  letter-spacing: .04em;
+  letter-spacing: -0.5px;
 }
 #status-dot {
   display: inline-block;
@@ -433,8 +435,10 @@ select:focus { outline: none; border-color: var(--accent); }
 /* === PIE (FOOTER) === */
 footer {
   border-top: 1px solid var(--border);
-  margin-top: 64px;
-  padding: 24px 32px;
+  background: rgba(13, 17, 23, 0.95);
+  backdrop-filter: blur(12px);
+  margin-top: 0.5rem;
+  padding: 0.5rem 3rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -558,7 +562,7 @@ footer a:hover { text-decoration: underline; }
 
 <footer>
   <a href="#" class="footer-logo">
-    <img src="image/vectra_ia_lab_horizontal.png" height="60">
+    <img src="image/vectra_ia_lab_transparente.png" height="60">
   </a>
 
   <nav class="footer-nav">
