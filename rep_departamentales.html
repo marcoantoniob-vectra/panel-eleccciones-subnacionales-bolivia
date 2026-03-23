@@ -445,6 +445,62 @@ footer p { font-size: 11px; color: var(--text3); }
 footer a { color: var(--accent); text-decoration: none; }
 footer a:hover { text-decoration: underline; }
 
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+  }
+
+  .footer-logo-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .footer-logo-text span { color: var(--cyan); }
+
+  .footer-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .footer-home-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.6rem 1.5rem;
+    border-radius: 5px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--bg-dark);
+    background: linear-gradient(135deg, var(--blue), var(--cyan));
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s, box-shadow 0.2s, transform 0.2s;
+    box-shadow: 0 0 20px rgba(45,140,240,0.3);
+  }
+
+  .footer-home-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 24px rgba(0,229,255,0.4);
+  }
+
+  .footer-home-btn svg { width: 14px; height: 14px; }
+
+  .footer-copy {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+	
 /* === RESPONSIVIDAD === */
 @media (max-width: 700px) {
   main { padding: 24px 16px 60px; }
@@ -497,10 +553,25 @@ footer a:hover { text-decoration: underline; }
   </div>
 
   <div id="content" style="display:none"></div>
+  <p>Fuente: Tribunal Supremo Electoral · Bolivia · Elecciones Subnacionales 2021</p>
 </main>
 
 <footer>
-  <p>Fuente: Tribunal Supremo Electoral · Bolivia · Elecciones Subnacionales 2021</p>
+  <a href="#" class="footer-logo">
+    <img src="image/vectra_ia_lab_horizontal.png" height="60">
+  </a>
+
+  <nav class="footer-nav">
+    <a href="https://marcoantoniob-vectra.github.io/panel-eleccciones-subnacionales-bolivia/" class="footer-home-btn">
+      <svg viewBox="0 0 14 14" fill="none">
+        <path d="M1 7L7 1l6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3 5v7h3v-3h2v3h3V5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Inicio
+    </a>
+  </nav>
+
+  <span class="footer-copy">© 2026 VectrA> IA Lab</span>
 </footer>
 
 <script>
