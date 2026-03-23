@@ -8,6 +8,9 @@
 <style>
   :root {
     --bg: #0a0c10;
+    --bg-dark: #0d1117;
+    --blue: #2d8cf0;
+    --cyan: #00e5ff;
     --surface: #111318;
     --card: #171b23;
     --border: #232836;
@@ -18,7 +21,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; min-height: 100vh; }
 
-  /* HEADER */
+  /* === CABECERA (HEADER) === */
   header {
     border-bottom: 1px solid var(--border);
     padding: 16px 32px;
@@ -35,7 +38,7 @@
   .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
   .logo-sub { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 2px; font-weight: 400; }
 
-  /* STATUS PILLS */
+   /* === ESTADOS === */
   .header-right { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
   .status-pills { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
   .status-pill { display: flex; align-items: center; gap: 7px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
@@ -45,14 +48,14 @@
   .sdot.error   { background: #ef4444; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
 
-  /* YEAR TOGGLE */
+   /* === SELECTOR DE AÑO === */
   .year-toggle { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
   .year-btn { padding: 6px 16px; background: transparent; border: none; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; transition: all .18s; }
   .year-btn.active { background: var(--accent); color: #000; font-weight: 700; }
   .year-btn:not(.active):hover { background: var(--border); color: var(--text); }
   .year-btn:disabled { opacity: .3; cursor: default; }
 
-  /* LOADING / ERROR SCREENS */
+   /* === CARGA Y ERRORES === */
   #loadingScreen { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 120px 20px; gap: 14px; color: var(--muted); }
   .spinner { width: 34px; height: 34px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .75s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -61,11 +64,11 @@
   #errorScreen p { font-size: 13px; line-height: 1.7; }
   code { display: inline-block; margin-top: 8px; padding: 5px 12px; background: var(--card); border: 1px solid var(--border); border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent); }
 
-  /* APP */
+  /* === VISTA PRINCIPAL) === */
   #app { display: none; }
   main { padding: 26px 32px; max-width: 1400px; margin: 0 auto; }
 
-  /* TABS */
+  /* === PESTAÑAS === */
   .tab-row { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
   .tab { padding: 10px 16px; font-size: 11px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; transition: all .18s; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .6px; }
   .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
@@ -73,17 +76,17 @@
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 
-  /* SECTION LABEL */
+  /* === SECCIÓN ETIQUETAS === */
   .slabel { font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 12px; }
 
-  /* CONTROLS */
+  /* === CONTROLES === */
   .controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; align-items: center; }
   select, input[type="text"] { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 8px 13px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; cursor: pointer; transition: border-color .18s; }
   select:focus, input:focus { border-color: var(--accent); }
   input[type="text"] { min-width: 200px; }
   input::placeholder { color: var(--muted); }
 
-  /* KPI */
+  /* === KPI === */
   .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 22px; }
   .kpi { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px 18px; position: relative; overflow: hidden; }
   .kpi::before { content:''; position: absolute; top:0;left:0;right:0; height:2px; background:var(--accent); opacity:.4; }
@@ -91,25 +94,25 @@
   .kpi-value { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; color: var(--accent); }
   .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
-  /* ASSEMBLY CARD */
+  /* === TARJETAS === */
   .acard { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px 22px; margin-bottom: 22px; }
   .acard-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 13px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
   .total-lbl { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
   .total-lbl span { color: var(--accent); font-weight: 700; }
 
-  /* BAR */
+  /* === BARRRAS === */
   .bar-wrap { width:100%; height:32px; border-radius:6px; overflow:hidden; display:flex; margin-bottom:11px; position:relative; }
   .bseg { height:100%; transition: filter .18s; cursor:default; }
   .bseg:hover { filter: brightness(1.2); }
   .maj-line { position:absolute; top:0;bottom:0; width:2px; background:rgba(255,255,255,.4); pointer-events:none; z-index:2; }
 
-  /* LEGEND */
+  /* === LEYENDA === */
   .legend { display: flex; flex-wrap: wrap; gap: 9px 16px; }
   .leg-item { display: flex; align-items: center; gap: 5px; font-size: 12px; }
   .leg-dot { width:9px; height:9px; border-radius:3px; flex-shrink:0; }
   .leg-n { font-family: 'DM Mono', monospace; font-size: 11px; }
 
-  /* CARD GRIDS */
+  /* === DISTRIBUCIÓN TARJETAS === */
   .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(265px,1fr)); gap: 12px; margin-bottom: 22px; }
   .icard { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: border-color .18s, transform .15s; }
   .icard:hover { border-color: var(--accent); transform: translateY(-1px); }
@@ -122,7 +125,7 @@
   .chip-dot { width:7px; height:7px; border-radius:2px; flex-shrink:0; }
   .chip b { color: var(--text); }
 
-  /* DETAIL PANEL */
+  /* === PANEL DETALLADO === */
   .dpanel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; margin-bottom: 22px; display:none; animation: fadein .2s; }
   .dpanel.open { display: block; }
   @keyframes fadein { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:none} }
@@ -144,13 +147,13 @@
   .cup{background:rgba(34,197,94,.15);color:#4ade80} .cdn{background:rgba(239,68,68,.15);color:#f87171} .ceq{background:rgba(100,116,139,.12);color:var(--muted)}
   .nodata { color:var(--muted); font-style:italic; font-size:12px; padding:20px 0; text-align:center; }
 
-  /* TOOLTIP */
+  /* === TOOLTIP === */
   .tooltip { position:fixed; background:#1c2030; border:1px solid var(--border); padding:6px 11px; border-radius:8px; font-size:12px; pointer-events:none; z-index:9999; opacity:0; transition:opacity .12s; }
   .tooltip.show { opacity:1; }
 
   .empty { text-align:center; padding:60px 20px; color:var(--muted); font-size:13px; }
 
-  /* TOP 10 */
+  /* === TOP 10 === */
   .top10-list { display:flex; flex-direction:column; }
   .top10-row {
     display:grid;
@@ -171,6 +174,84 @@
   @media(max-width:640px){
     .top10-row { grid-template-columns:1fr auto; }
     .top10-bar-wrap { display:none; }
+  }
+
+  /* === PIE (FOOTER) === */
+  footer {
+    position: relative;
+    z-index: 10;
+    background: rgba(13, 17, 23, 0.95);
+    border-top: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    padding: 0.5rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  footer::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--blue), var(--cyan), transparent);
+    opacity: 0.5;
+  }
+
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+  }
+
+  .footer-logo-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .footer-logo-text span { color: var(--cyan); }
+
+  .footer-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .footer-home-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.6rem 1.5rem;
+    border-radius: 5px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--bg-dark);
+    background: linear-gradient(135deg, var(--blue), var(--cyan));
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s, box-shadow 0.2s, transform 0.2s;
+    box-shadow: 0 0 20px rgba(45,140,240,0.3);
+  }
+
+  .footer-home-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 24px rgba(0,229,255,0.4);
+  }
+
+  .footer-home-btn svg { width: 14px; height: 14px; }
+
+  .footer-copy {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text-muted);
   }
 
   @media(max-width:600px){ main{padding:14px;} header{padding:13px 14px;} }
@@ -271,6 +352,23 @@
   </div>
 
 </main>
+<footer>
+  <a href="#" class="footer-logo">
+    <img src="image/vectra_ia_lab_horizontal.png" height="60">
+  </a>
+
+  <nav class="footer-nav">
+    <a href="#" class="footer-home-btn">
+      <svg viewBox="0 0 14 14" fill="none">
+        <path d="M1 7L7 1l6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3 5v7h3v-3h2v3h3V5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Inicio
+    </a>
+  </nav>
+
+  <span class="footer-copy">© 2026 VectrA> IA Lab</span>
+</footer>
 </div>
 
 <script>
