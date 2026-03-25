@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distribución de Escaños — Método D'Hondt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link rel="apple-touch-icon" sizes="180x180" href="image/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="image/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="image/favicon-16x16.png">
+<link rel="manifest" href="site.webmanifest">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+/* === BASE === */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ff-head: 'Fraunces', Georgia, serif;
+    --ff-body: 'DM Sans', system-ui, sans-serif;
+    --blue: #2d8cf0;
+    --cyan: #00e5ff;
+	--c-accent: #2d8cf0;
+    --c-accent-dark: #00e5ff;
+    --c-accent-light: #E1F5EE;
+    --c-bg: #ffffff;
+    --c-surface: #f7f6f3;
+    --c-border: rgba(0,0,0,0.1);
+    --c-border-med: rgba(0,0,0,0.18);
+    --c-ink: #1a1a1a;
+    --c-muted: #6b6b6b;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --c-bg: rgba(15,17,23,0.92);
+      --c-surface: #242424;
+      --c-border: rgba(255,255,255,0.1);
+      --c-border-med: rgba(255,255,255,0.18);
+      --c-ink: #f0f0f0;
+      --c-muted: #999;
+      --c-accent-light: #0a3326;
+    }
+  }
+
+  body {
+    font-family: var(--ff-body);
+    color: var(--c-ink);
+    background: var(--c-bg);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+/* === CABECERA (HEADER) === */
+
+  header {
+	border-bottom: 1px solid var(--border);
+	padding: 0 32px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 120px;
+	position: sticky;
+	top: 0;
+	background: rgba(15,17,23,0.92);
+	backdrop-filter: blur(12px);
+	z-index: 100;
+  }
+  
+  .header-logo {
+    font-family: var(--font-head);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  
+  .header-meta {
+	  font-size: 11px;
+	  color: var(--text3);
+	  letter-spacing: .04em;
+  }
+  
+  .header-title { font-family: var(--ff-head); font-size: 17px; font-weight: 400; }
+  .header-sub { font-size: 12px; color: var(--c-muted); }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  .tabs { display: flex; border-bottom: 0.5px solid var(--c-border); margin-bottom: 2.5rem; gap: 0; }
+  .tab {
+    padding: 10px 22px; font-family: var(--ff-body); font-size: 14px; font-weight: 500;
+    border: none; background: transparent; cursor: pointer; color: var(--c-muted);
+    border-bottom: 2px solid transparent; margin-bottom: -0.5px; transition: color 0.2s;
+  }
+  .tab.active { color: var(--c-accent); border-bottom-color: var(--c-accent); }
+  .tab:hover:not(.active) { color: var(--c-ink); }
+  .panel { display: none; } .panel.active { display: block; }
+
+  /* === Tipografía === */
+  .hero-title { font-family: var(--ff-head); font-size: 28px; font-weight: 400; line-height: 1.3; margin-bottom: 0.5rem; }
+  .hero-sub { color: var(--c-muted); font-size: 14px; margin-bottom: 2rem; }
+  .section-title { font-family: var(--ff-head); font-size: 18px; font-weight: 400; margin: 2rem 0 1rem; }
+
+  /* === Tarjetas === */
+  .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 12px; margin: 1.5rem 0; }
+  .concept-card { background: var(--c-surface); border-radius: var(--radius-lg); padding: 1rem 1.2rem; border: 0.5px solid var(--c-border); }
+  .concept-num { font-family: var(--ff-head); font-size: 30px; color: var(--c-accent); font-weight: 400; }
+  .concept-label { font-size: 13px; color: var(--c-muted); margin-top: 4px; line-height: 1.4; }
+
+  /* === Pasos === */
+  .step-row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 1rem; }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--c-accent); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 500; flex-shrink: 0; margin-top: 2px;
+  }
+  .step-body strong { font-weight: 500; display: block; }
+  .step-body p { font-size: 14px; color: var(--c-muted); margin-top: 2px; }
+
+  /* === Tablas === */
+  .table-wrap { overflow-x: auto; border-radius: var(--radius-lg); border: 0.5px solid var(--c-border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: var(--c-surface); padding: 9px 12px; text-align: left; font-weight: 500; border-bottom: 0.5px solid var(--c-border); white-space: nowrap; color: var(--c-ink); }
+  td { padding: 7px 12px; border-bottom: 0.5px solid var(--c-border); color: var(--c-ink); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+
+  .dhondt-table th { text-align: center; }
+  .dhondt-table th:first-child { text-align: left; }
+  .dhondt-table td { text-align: center; }
+  .dhondt-table td:first-child { text-align: left; }
+  .q-winner { border-radius: 4px; padding: 2px 6px; font-weight: 500; display: inline-block; }
+  .q-muted { color: var(--c-muted); }
+
+  /* === Notas === */
+  .note-box {
+    background: var(--c-accent-light); border-left: 3px solid var(--c-accent);
+    padding: 1rem 1.2rem; border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    margin: 1.5rem 0; font-size: 14px; color: var(--c-accent-dark);
+  }
+
+  /* === Bloques === */
+  .block-section { border: 0.5px solid var(--c-border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; }
+  .block-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+  .block-num {
+    width: 24px; height: 24px; border-radius: 50%; background: var(--c-accent); color: white;
+    font-size: 12px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .block-title { font-family: var(--ff-head); font-size: 16px; font-weight: 400; }
+  .block-desc { font-size: 13px; color: var(--c-muted); margin-bottom: 1rem; line-height: 1.5; }
+
+  /* === Botones === */
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 18px; background: var(--c-accent); color: white;
+    border: none; border-radius: var(--radius-md);
+    font-family: var(--ff-body); font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity 0.2s;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 18px; background: transparent; color: var(--c-ink);
+    border: 0.5px solid var(--c-border-med); border-radius: var(--radius-md);
+    font-family: var(--ff-body); font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s;
+  }
+  .btn-secondary:hover { background: var(--c-surface); }
+
+  /* === Carga de archivo === */
+  .upload-zone {
+    border: 1.5px dashed var(--c-border-med); border-radius: var(--radius-lg);
+    padding: 2.5rem; text-align: center; cursor: pointer;
+    transition: border-color 0.2s; position: relative; margin-top: 1rem;
+  }
+  .upload-zone:hover { border-color: var(--c-accent); }
+  .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .upload-icon { font-size: 32px; margin-bottom: 12px; }
+  .upload-text { font-size: 14px; color: var(--c-muted); }
+
+  /* === Alertas === */
+  .error-box { background: #FCEBEB; border: 0.5px solid #F09595; border-radius: var(--radius-md); padding: 1rem 1.2rem; color: #A32D2D; font-size: 13px; margin-top: 1rem; }
+  .success-badge { background: #E1F5EE; color: #085041; border-radius: var(--radius-md); padding: 4px 10px; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; gap: 5px; }
+
+  /* === Escaños === */
+  .seats-input {
+    width: 72px; padding: 6px 10px;
+    border: 0.5px solid var(--c-border-med); border-radius: var(--radius-md);
+    font-family: var(--ff-body); font-size: 14px;
+    background: var(--c-bg); color: var(--c-ink);
+  }
+  .inline-form { display: flex; align-items: center; gap: 10px; margin-top: 1rem; flex-wrap: wrap; font-size: 13px; color: var(--c-muted); }
+
+  /* === Bloque de escaños === */
+  .chips-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .force-chip {
+    border: 0.5px solid var(--c-border); border-radius: var(--radius-lg);
+    padding: 10px 14px; display: flex; align-items: center; gap: 10px;
+    min-width: 160px; flex: 1; background: var(--c-bg);
+  }
+  .chip-swatch { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .chip-name { font-size: 13px; font-weight: 500; flex: 1; }
+  .chip-votos { font-size: 12px; color: var(--c-muted); }
+  .chip-pct { font-size: 11px; border-radius: 20px; padding: 2px 8px; font-weight: 500; flex-shrink: 0; }
+  .bar-track { background: var(--c-surface); border-radius: 4px; height: 5px; width: 100%; margin-top: 5px; }
+  .bar-fill { height: 5px; border-radius: 4px; }
+
+  .hidden { display: none; }
+
+  /* === PIE (FOOTER) === */
+  footer {
+    position: relative;
+    z-index: 10;
+    background: rgba(13, 17, 23, 0.95);
+    border-top: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    padding: 0.5rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  footer::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--blue), var(--cyan), transparent);
+    opacity: 0.5;
+  }
+
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+  }
+
+  .footer-logo-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .footer-logo-text span { color: var(--cyan); }
+
+  .footer-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .footer-home-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.6rem 1.5rem;
+    border-radius: 5px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--bg-dark);
+    background: linear-gradient(135deg, var(--blue), var(--cyan));
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s, box-shadow 0.2s, transform 0.2s;
+    box-shadow: 0 0 20px rgba(45,140,240,0.3);
+  }
+
+  .footer-home-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 24px rgba(0,229,255,0.4);
+  }
+
+  .footer-home-btn svg { width: 14px; height: 14px; }
+
+  .footer-copy {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+  
+  
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-logo"><img src="image/vectra_ia_lab_transparente.png" height="120"></div>
+  <div class="header-meta">
+    <span id="status-dot"></span>
+    <span id="status-text">Distribución de Escaños — Método D'Hondt</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="hero">
+	<h1>Distribución de Escaños — Método D'Hondt</h1>
+	<h2>Asambleas Legislativas Departamentales y Concejos Municipales</h2>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('t1')">¿Cómo funciona?</button>
+    <button class="tab" onclick="switchTab('t2')">Calculadora</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ TAB 1 -->
+  <div class="panel active" id="t1">
+    <h1 class="hero-title">El método D'Hondt para la distribución de escaños</h1>
+    <p class="hero-sub">Un sistema proporcional para convertir votos en representación política en Asambleas Departamentales y Concejos municipales</p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-num">1878</div>
+        <div class="concept-label">Año en que el jurista belga Victor D'Hondt propuso el método</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-num">÷ N</div>
+        <div class="concept-label">Se dividen los votos de cada fuerza entre 1, 2, 3… hasta N escaños</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-num">Top</div>
+        <div class="concept-label">Los cocientes más altos determinan quién obtiene cada escaño</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">¿Cómo se aplica el método?</h2>
+
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div class="step-body"><strong>Registrar los votos</strong><p>Se anotan los votos totales obtenidos por cada fuerza política participante en la elección.</p></div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div class="step-body"><strong>Calcular los cocientes</strong><p>Los votos de cada fuerza se dividen entre 1, luego entre 2, entre 3… hasta el número total de escaños a distribuir.</p></div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div class="step-body"><strong>Ordenar los cocientes</strong><p>Todos los cocientes obtenidos se ordenan de mayor a menor en una tabla unificada que agrupa a todas las fuerzas.</p></div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">4</div>
+      <div class="step-body"><strong>Asignar los escaños</strong><p>Se asigna un escaño a la fuerza con el cociente más alto, luego al segundo, y así sucesivamente hasta completar todos los escaños disponibles.</p></div>
+    </div>
+
+    <h2 class="section-title">Ejemplo real: Elecciones Subnacionales 2026. Concejo Municipal de Potosí — 11 escaños</h2>
+    <p style="font-size:14px;color:var(--c-muted);margin-bottom:1rem">
+      Datos oficiales de la elección. Se muestran las 8 fuerzas más votadas. Las celdas resaltadas son los cocientes ganadores que determinan cada escaño.
+    </p>
+
+    <div class="table-wrap" id="example-table-container"></div>
+
+    <h2 class="section-title" style="margin-top:2rem">Resultado final</h2>
+    <div id="example-result-container"></div>
+
+    <div class="note-box">
+      El método D'Hondt tiende a beneficiar ligeramente a las fuerzas más votadas, ya que al dividir entre números mayores los cocientes de las fuerzas pequeñas se vuelven menos competitivos. Es uno de los sistemas más usados en América Latina y Europa para elecciones parlamentarias y concejos municipales.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ TAB 2 -->
+  <div class="panel" id="t2">
+
+    <!-- Bloque 1 -->
+    <div class="block-section">
+      <div class="block-header">
+        <div class="block-num">1</div>
+        <div class="block-title">Descargar plantilla</div>
+      </div>
+      <p class="block-desc">Descarga la plantilla, complétala con los nombres de las fuerzas políticas y sus votos, luego súbela en el bloque 2.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn-primary" onclick="downloadCSV()">Descargar plantilla CSV</button>
+        <button class="btn-secondary" onclick="downloadXLSX()">Descargar plantilla Excel (.xlsx)</button>
+      </div>
+      <p style="font-size:12px;color:var(--c-muted);margin-top:10px">
+        Columnas requeridas: <strong>Fuerza Política</strong> y <strong>Total Votos</strong>. Separador CSV: punto y coma (;)
+      </p>
+    </div>
+
+    <!-- Bloque 2 -->
+    <div class="block-section">
+      <div class="block-header">
+        <div class="block-num">2</div>
+        <div class="block-title">Cargar datos</div>
+      </div>
+      <p class="block-desc">Sube el archivo CSV o Excel (.xlsx) con los resultados electorales. El archivo debe tener las columnas <em>Fuerza Política</em> y <em>Total Votos</em>. Luego selecciona la cantidad de escaños a distribuir</p>
+      <div class="inline-form">
+        <label>Número de escaños a distribuir:</label>
+        <input type="number" class="seats-input" id="seats-input" value="11" min="1" max="50">
+      </div>
+      <div class="upload-zone">
+        <input type="file" id="file-input" accept=".csv,.xlsx" onchange="handleFile(this.files[0])">
+        <div class="upload-icon">📂</div>
+        <div class="upload-text">Arrastra tu archivo aquí o haz clic para seleccionarlo</div>
+        <div style="font-size:12px;color:var(--c-muted);margin-top:6px">Formatos aceptados: CSV, Excel (.xlsx)</div>
+      </div>
+      <div id="file-error" class="error-box hidden"></div>
+      <div id="file-success" class="hidden" style="margin-top:12px">
+        <span class="success-badge">✓ Archivo cargado correctamente</span>
+      </div>
+    </div>
+
+    <!-- Bloque 3 -->
+    <div class="block-section hidden" id="results-block">
+      <div class="block-header">
+        <div class="block-num">3</div>
+        <div class="block-title">Distribución D'Hondt — tabla de cocientes</div>
+      </div>
+      <p style="font-size:13px;color:var(--c-muted);margin-bottom:1rem">
+        Cada columna muestra el cociente al dividir los votos entre el divisor correspondiente. Las celdas marcadas son los cocientes ganadores que determinan cada escaño.
+      </p>
+      <div id="results-table-container"></div>
+    </div>
+
+    <!-- Bloque 4 -->
+    <div class="block-section hidden" id="visual-block">
+      <div class="block-header">
+        <div class="block-num">4</div>
+        <div class="block-title">Fuerzas políticas y resultado final</div>
+      </div>
+      <p style="font-size:13px;color:var(--c-muted);margin-bottom:1rem">
+        Resumen de participación electoral y escaños obtenidos por cada fuerza.
+      </p>
+      <div id="chips-container"></div>
+      <div style="margin-top:1.5rem;border-top:0.5px solid var(--c-border);padding-top:1.2rem">
+        <p style="font-size:13px;font-weight:500;margin-bottom:10px">Composición del Concejo Municipal o Asamblea</p>
+        <div id="assembly-container"></div>
+      </div>
+    </div>
+
+    <!-- Bloque 5 -->
+    <div class="block-section hidden" id="reset-block">
+      <div class="block-header">
+        <div class="block-num">5</div>
+        <div class="block-title">Procesar una nueva distribución</div>
+      </div>
+      <p class="block-desc">¿Deseas calcular la distribución para otro municipio o departamento? Haz clic para reiniciar y cargar un nuevo archivo.</p>
+      <button class="btn-secondary" onclick="resetAll()">↺ Procesar nuevo archivo</button>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <a href="#" class="footer-logo">
+    <img src="image/vectra_ia_lab_transparente.png" height="60">
+  </a>
+
+  <nav class="footer-nav">
+    <a href="https://marcoantoniob-vectra.github.io/panel-eleccciones-subnacionales-bolivia/" class="footer-home-btn">
+      <svg viewBox="0 0 14 14" fill="none">
+        <path d="M1 7L7 1l6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3 5v7h3v-3h2v3h3V5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Inicio
+    </a>
+  </nav>
+
+  <span class="footer-copy">© 2026 VectrA> IA Lab</span>
+</footer>
+
+<script>
+const POTOSI_DATA = [
+  {fuerza:"A.S.", votos:15267},
+  {fuerza:"PATRIA-UNIDOS", votos:12343},
+  {fuerza:"MTS", votos:10743},
+  {fuerza:"S-P", votos:8273},
+  {fuerza:"MNR", votos:7962},
+  {fuerza:"APB-SUMATE", votos:7419},
+  {fuerza:"NGP", votos:5968},
+  {fuerza:"LIBRE", votos:5038},
+  {fuerza:"JAP", votos:4980},
+  {fuerza:"APP", votos:3240},
+  {fuerza:"UN", votos:2876},
+  {fuerza:"CAOP", votos:2689},
+  {fuerza:"ASCAP", votos:2486},
+  {fuerza:"PDC", votos:2261},
+  {fuerza:"A-UPP", votos:1048},
+  {fuerza:"DEMOCRATAS", votos:1019}
+];
+
+const PALETTE = [
+  {bg:"#E1F5EE", txt:"#085041", dot:"#1D9E75"},
+  {bg:"#E6F1FB", txt:"#0C447C", dot:"#185FA5"},
+  {bg:"#FAECE7", txt:"#712B13", dot:"#D85A30"},
+  {bg:"#FBEAF0", txt:"#72243E", dot:"#D4537E"},
+  {bg:"#EAF3DE", txt:"#27500A", dot:"#639922"},
+  {bg:"#EEEDFE", txt:"#3C3489", dot:"#7F77DD"},
+  {bg:"#FAEEDA", txt:"#633806", dot:"#BA7517"},
+  {bg:"#FCEBEB", txt:"#791F1F", dot:"#E24B4A"},
+  {bg:"#E1F5EE", txt:"#04342C", dot:"#0F6E56"},
+  {bg:"#E6F1FB", txt:"#042C53", dot:"#378ADD"},
+  {bg:"#F1EFE8", txt:"#444441", dot:"#888780"},
+  {bg:"#EAF3DE", txt:"#173404", dot:"#3B6D11"},
+  {bg:"#FBEAF0", txt:"#4B1528", dot:"#993556"},
+  {bg:"#FAEEDA", txt:"#412402", dot:"#854F0B"},
+  {bg:"#FCEBEB", txt:"#501313", dot:"#A32D2D"},
+  {bg:"#EEEDFE", txt:"#26215C", dot:"#534AB7"},
+];
+
+function dhondt(data, seats) {
+  const quotients = [];
+  data.forEach(p => {
+    for (let d = 1; d <= seats; d++) {
+      quotients.push({fuerza: p.fuerza, votos: p.votos, divisor: d, q: p.votos / d});
+    }
+  });
+  quotients.sort((a, b) => b.q - a.q);
+  const assigned = {};
+  data.forEach(p => assigned[p.fuerza] = 0);
+  for (let i = 0; i < seats; i++) assigned[quotients[i].fuerza]++;
+  return {quotients, assigned};
+}
+
+function buildExampleTable() {
+  const seats = 11;
+  const {quotients, assigned} = dhondt(POTOSI_DATA, seats);
+  const topKeys = new Set(quotients.slice(0, seats).map(q => `${q.fuerza}-${q.divisor}`));
+  const shown = POTOSI_DATA.slice(0, 8);
+
+  let html = '<table class="dhondt-table"><thead><tr><th style="min-width:120px;text-align:left">Fuerza</th><th>Votos</th>';
+  for (let d = 1; d <= seats; d++) html += `<th>÷${d}</th>`;
+  html += '</tr></thead><tbody>';
+
+  shown.forEach(p => {
+    html += `<tr><td><strong>${p.fuerza}</strong></td><td style="font-weight:500">${p.votos.toLocaleString('es-BO')}</td>`;
+    for (let d = 1; d <= seats; d++) {
+      const key = `${p.fuerza}-${d}`;
+      const q = Math.round(p.votos / d);
+      if (topKeys.has(key)) {
+        html += `<td><span class="q-winner" style="background:#9FE1CB;color:#085041">${q.toLocaleString('es-BO')}</span></td>`;
+      } else {
+        html += `<td class="q-muted">${q.toLocaleString('es-BO')}</td>`;
+      }
+    }
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  document.getElementById('example-table-container').innerHTML = html;
+
+  const withSeats = POTOSI_DATA.filter(p => assigned[p.fuerza] > 0)
+    .sort((a,b) => assigned[b.fuerza] - assigned[a.fuerza]);
+
+  let res = '<div style="display:flex;flex-wrap:wrap;gap:10px">';
+  withSeats.forEach((p, i) => {
+    const pal = PALETTE[i % PALETTE.length];
+    const s = assigned[p.fuerza];
+    const dots = Array.from({length: s}, () =>
+      `<span style="width:12px;height:12px;border-radius:50%;background:${pal.dot};display:inline-block;margin:1px"></span>`
+    ).join('');
+    res += `<div style="border:0.5px solid var(--c-border);border-radius:var(--radius-lg);padding:10px 14px;min-width:120px;flex:1;background:var(--c-bg)">
+      <div style="font-size:13px;font-weight:500;color:${pal.dot};margin-bottom:6px">${p.fuerza}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:2px;margin-bottom:6px">${dots}</div>
+      <div style="font-family:var(--ff-head);font-size:20px;color:${pal.dot}">${s} <span style="font-family:var(--ff-body);font-size:12px;color:var(--c-muted);font-weight:400">escaño${s > 1 ? 's' : ''}</span></div>
+    </div>`;
+  });
+  res += '</div>';
+  document.getElementById('example-result-container').innerHTML = res;
+}
+
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', (i === 0 && id === 't1') || (i === 1 && id === 't2'));
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function downloadCSV() {
+  const csv = "Fuerza Política;Total Votos\nEjemplo Partido A;12500\nEjemplo Partido B;8300\nEjemplo Partido C;5100\n";
+  const blob = new Blob(["\uFEFF" + csv], {type: 'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'plantilla_concejo.csv';
+  a.click();
+}
+
+function downloadXLSX() {
+  if (typeof XLSX === 'undefined') { alert('La librería XLSX no está disponible.'); return; }
+  const ws = XLSX.utils.aoa_to_sheet([
+    ["Fuerza Política", "Total Votos"],
+    ["Ejemplo Partido A", 12500],
+    ["Ejemplo Partido B", 8300],
+    ["Ejemplo Partido C", 5100]
+  ]);
+  ws['!cols'] = [{wch: 25}, {wch: 15}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Datos");
+  XLSX.writeFile(wb, "plantilla_concejo.xlsx");
+}
+
+function handleFile(file) {
+  if (!file) return;
+  const errEl = document.getElementById('file-error');
+  const okEl = document.getElementById('file-success');
+  errEl.classList.add('hidden');
+  okEl.classList.add('hidden');
+  const seats = parseInt(document.getElementById('seats-input').value) || 11;
+  const ext = file.name.split('.').pop().toLowerCase();
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      let data;
+      if (ext === 'csv') {
+        data = parseCSV(e.target.result);
+      } else if (ext === 'xlsx' || ext === 'xls') {
+        const wb = XLSX.read(e.target.result, {type: 'array'});
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        data = parseRows(XLSX.utils.sheet_to_json(ws, {header: 1}));
+      } else {
+        throw new Error('Formato no soportado. Usa CSV o Excel (.xlsx).');
+      }
+      validateData(data);
+      okEl.classList.remove('hidden');
+      showResults(data, seats);
+    } catch(err) {
+      errEl.textContent = '⚠ ' + err.message;
+      errEl.classList.remove('hidden');
+    }
+  };
+  if (ext === 'csv') reader.readAsText(file, 'UTF-8');
+  else reader.readAsArrayBuffer(file);
+}
+
+function parseCSV(text) {
+  const lines = text.replace(/\r/g, '').split('\n').filter(l => l.trim());
+  if (lines.length < 2) throw new Error('El archivo está vacío o solo tiene encabezados. Agrega al menos una fuerza política.');
+  const sep = lines[0].includes(';') ? ';' : ',';
+  const headers = lines[0].split(sep).map(h => h.trim().toLowerCase().replace(/[^a-záéíóúñ\s]/gi, '').trim());
+  const fIdx = headers.findIndex(h => h.includes('fuerza') || h.includes('partido') || h.includes('nombre'));
+  const vIdx = headers.findIndex(h => h.includes('voto') || h.includes('total'));
+  if (fIdx < 0) throw new Error('No se encontró la columna "Fuerza Política". Verifica que el encabezado exista.');
+  if (vIdx < 0) throw new Error('No se encontró la columna "Total Votos". Verifica que el encabezado exista.');
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(sep);
+    if (cols.length < 2) continue;
+    const fuerza = cols[fIdx]?.trim();
+    const votos = parseInt(cols[vIdx]?.trim().replace(/[.\s]/g, '').replace(',', ''));
+    if (!fuerza) throw new Error(`Fila ${i+1}: el nombre de la fuerza política está vacío.`);
+    if (isNaN(votos) || votos < 0) throw new Error(`Fila ${i+1} (${fuerza}): el valor de votos "${cols[vIdx]?.trim()}" no es un número válido.`);
+    rows.push({fuerza, votos});
+  }
+  return rows;
+}
+
+function parseRows(rows) {
+  if (rows.length < 2) throw new Error('El archivo está vacío o solo tiene encabezados.');
+  const headers = rows[0].map(h => String(h || '').trim().toLowerCase());
+  const fIdx = headers.findIndex(h => h.includes('fuerza') || h.includes('partido') || h.includes('nombre'));
+  const vIdx = headers.findIndex(h => h.includes('voto') || h.includes('total'));
+  if (fIdx < 0) throw new Error('No se encontró la columna "Fuerza Política" en el Excel.');
+  if (vIdx < 0) throw new Error('No se encontró la columna "Total Votos" en el Excel.');
+  const data = [];
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    if (!row || row.every(c => c === undefined || c === '')) continue;
+    const fuerza = String(row[fIdx] || '').trim();
+    const votos = parseInt(row[vIdx]);
+    if (!fuerza) throw new Error(`Fila ${i+1}: el nombre de la fuerza política está vacío.`);
+    if (isNaN(votos) || votos < 0) throw new Error(`Fila ${i+1} (${fuerza}): el valor de votos no es válido.`);
+    data.push({fuerza, votos});
+  }
+  return data;
+}
+
+function validateData(data) {
+  if (data.length === 0) throw new Error('No se encontraron datos en el archivo. Verifica el formato.');
+  if (data.length < 2) throw new Error('Se necesitan al menos 2 fuerzas políticas para calcular la distribución.');
+  if (data.reduce((s, d) => s + d.votos, 0) === 0) throw new Error('El total de votos es cero. Verifica los datos del archivo.');
+}
+
+function showResults(data, seats) {
+  const {quotients, assigned} = dhondt(data, seats);
+  const sorted = [...data].sort((a, b) => b.votos - a.votos);
+  const total = data.reduce((s, d) => s + d.votos, 0);
+  const colorMap = {};
+  sorted.forEach((p, i) => { colorMap[p.fuerza] = PALETTE[i % PALETTE.length]; });
+  const topKeys = new Set(quotients.slice(0, seats).map(q => `${q.fuerza}-${q.divisor}`));
+
+  // Tabla D'Hondt
+  let thtml = '<div style="overflow-x:auto"><table class="dhondt-table"><thead><tr>';
+  thtml += '<th style="min-width:110px;text-align:left">Fuerza</th><th>Votos</th>';
+  for (let d = 1; d <= seats; d++) thtml += `<th>÷${d}</th>`;
+  thtml += '<th>Escaños</th></tr></thead><tbody>';
+
+  sorted.forEach(p => {
+    const pal = colorMap[p.fuerza];
+    const s = assigned[p.fuerza];
+    thtml += `<tr>`;
+    thtml += `<td><span style="display:inline-flex;align-items:center;gap:6px">
+      <span style="width:8px;height:8px;border-radius:50%;background:${pal.dot};flex-shrink:0"></span>
+      ${p.fuerza}</span></td>`;
+    thtml += `<td style="font-weight:500">${p.votos.toLocaleString('es-BO')}</td>`;
+    for (let d = 1; d <= seats; d++) {
+      const key = `${p.fuerza}-${d}`;
+      const q = Math.round(p.votos / d);
+      if (topKeys.has(key)) {
+        thtml += `<td><span class="q-winner" style="background:${pal.bg};color:${pal.txt}">${q.toLocaleString('es-BO')}</span></td>`;
+      } else {
+        thtml += `<td class="q-muted">${q.toLocaleString('es-BO')}</td>`;
+      }
+    }
+    const dots = s > 0
+      ? Array.from({length: s}, () => `<span style="width:10px;height:10px;border-radius:50%;background:${pal.dot};display:inline-block;margin:1px"></span>`).join('')
+      : '<span style="color:var(--c-muted)">—</span>';
+    thtml += `<td style="white-space:nowrap">${dots}</td></tr>`;
+  });
+  thtml += '</tbody></table></div>';
+  document.getElementById('results-table-container').innerHTML = thtml;
+  document.getElementById('results-block').classList.remove('hidden');
+
+  // Chips
+  const maxVotos = Math.max(...sorted.map(p => p.votos));
+  let chips = '<div class="chips-grid">';
+  sorted.forEach(p => {
+    const pal = colorMap[p.fuerza];
+    const pct = ((p.votos / total) * 100).toFixed(1);
+    const s = assigned[p.fuerza];
+    const barW = Math.round((p.votos / maxVotos) * 100);
+    chips += `<div class="force-chip">
+      <span class="chip-swatch" style="background:${pal.dot}"></span>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
+          <span class="chip-name">${p.fuerza}</span>
+          <span class="chip-pct" style="background:${pal.bg};color:${pal.txt}">${pct}%</span>
+        </div>
+        <div class="chip-votos">${p.votos.toLocaleString('es-BO')} votos</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${barW}%;background:${pal.dot}"></div></div>
+      </div>
+      ${s > 0 ? `<span style="background:${pal.bg};color:${pal.txt};border-radius:20px;padding:3px 9px;font-size:12px;font-weight:500;flex-shrink:0">${s}</span>` : ''}
+    </div>`;
+  });
+  chips += '</div>';
+
+  // Composición
+  const withSeats = sorted.filter(p => assigned[p.fuerza] > 0);
+  let assembly = '<div style="display:flex;flex-wrap:wrap;gap:8px">';
+  withSeats.forEach(p => {
+    const pal = colorMap[p.fuerza];
+    const s = assigned[p.fuerza];
+    const dots = Array.from({length: s}, () =>
+      `<span style="width:10px;height:10px;border-radius:50%;background:${pal.dot};display:inline-block"></span>`
+    ).join('');
+    assembly += `<div style="display:inline-flex;align-items:center;gap:8px;background:${pal.bg};border-radius:20px;padding:6px 14px">
+      <span style="display:flex;gap:3px">${dots}</span>
+      <span style="font-size:13px;font-weight:500;color:${pal.txt}">${p.fuerza}</span>
+      <span style="font-size:13px;color:${pal.txt};opacity:0.7">${s}</span>
+    </div>`;
+  });
+  assembly += '</div>';
+
+  document.getElementById('chips-container').innerHTML = chips;
+  document.getElementById('assembly-container').innerHTML = assembly;
+  document.getElementById('visual-block').classList.remove('hidden');
+  document.getElementById('reset-block').classList.remove('hidden');
+
+  document.getElementById('results-block').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+function resetAll() {
+  document.getElementById('file-input').value = '';
+  document.getElementById('file-error').classList.add('hidden');
+  document.getElementById('file-success').classList.add('hidden');
+  document.getElementById('results-block').classList.add('hidden');
+  document.getElementById('visual-block').classList.add('hidden');
+  document.getElementById('reset-block').classList.add('hidden');
+  document.getElementById('seats-input').value = 11;
+  document.getElementById('upload-block') && document.getElementById('upload-block').scrollIntoView({behavior: 'smooth'});
+}
+
+buildExampleTable();
+</script>
+</body>
+</html>
